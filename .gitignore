@@ -1,0 +1,57 @@
+# Python cache and local environment
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# Runtime outputs and experiment artifacts
+logs/
+artifacts/
+tmp/
+summary_videos/
+runs/
+outputs/
+checkpoints/
+
+# Model checkpoints and weights
+weights/**/*.pt
+weights/**/*.pth
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Datasets and large local data files
+data/*.h5
+data/*.hdf5
+data/*.rar
+data/*.zip
+data/*.tar
+data/*.tar.gz
+data/*.tgz
+data/*.7z
+data/*.mp4
+data/*.avi
+data/*.mkv
+*.h5
+*.hdf5
+*.rar
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
