@@ -3,6 +3,20 @@ import numpy as np
 import random
 import torch
 
+VALID_DATASETS = ('SumMe','TVSum')
+
+def str2datasets(v):
+    if isinstance(v,(list,tuple)):
+        datasets = list(v)
+    else:
+        datasets = [item.strip() for item in str(v).split(',') if item.strip()]
+    if not datasets:
+        raise argparse.ArgumentTypeError('datasets must contain SumMe, TVSum, or both')
+    invalid = [item for item in datasets if item not in VALID_DATASETS]
+    if invalid:
+        raise argparse.ArgumentTypeError(f'Unknown dataset(s): {invalid}. Valid values are: {VALID_DATASETS}')
+    return datasets
+
 # Process bool argument
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -26,7 +40,7 @@ class Config(object):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-        self.datasets = ['SumMe','TVSum']
+        self.datasets = str2datasets(getattr(self,'datasets',['SumMe','TVSum']))
         self.SumMe_len = 25
         self.TVSum_len = 50
 
@@ -52,12 +66,29 @@ class Config(object):
 def get_config(parse=True, **optional_kwargs):
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--datasets', type=str2datasets, default=['SumMe','TVSum'])
     parser.add_argument('--seed', type=int, default=123456)
     parser.add_argument('--device', type=str, default='cuda:0')
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--batch_size', default='1')
     parser.add_argument('--learning_rate', default='1e-3')
     parser.add_argument('--weight_decay', default='1e-7')
+
+    # Optional experiment modules. Defaults preserve the clean CSTA baseline.
+    parser.add_argument('--use_multi_annot_loss', type=str2bool, default=False)
+    parser.add_argument('--ma_precision_ema', type=float, default=0.9)
+    parser.add_argument('--ma_precision_min', type=float, default=0.1)
+    parser.add_argument('--ma_precision_max', type=float, default=10.0)
+    parser.add_argument('--ma_precision_warmup', type=int, default=0)
+    parser.add_argument('--ma_loss_weight', type=float, default=1.0)
+    parser.add_argument('--ma_loss_weight_summe', type=str2none, default=None)
+    parser.add_argument('--ma_loss_weight_tvsum', type=str2none, default=None)
+    parser.add_argument('--use_rank_loss', type=str2bool, default=False)
+    parser.add_argument('--rank_loss_weight', type=float, default=0.0)
+    parser.add_argument('--rank_loss_min_diff', type=float, default=0.0)
+    parser.add_argument('--use_shot_loss', type=str2bool, default=False)
+    parser.add_argument('--shot_loss_weight', type=float, default=0.0)
+    parser.add_argument('--shot_loss_min_diff', type=float, default=0.0)
     
     parser.add_argument('--model_name', type=str, default='GoogleNet_Attention')
     parser.add_argument('--Scale', type=str2none, default=None)
